@@ -1,50 +1,50 @@
 using UnityEngine;
 
-public class GoPlaces : MonoBehaviour
+[RequireComponent(typeof(Transform))]
+public class Move : MonoBehaviour
 {
    [SerializeField] private float _speed;
-   [SerializeField] private Transform AllPlacesPoint;
+   [SerializeField] private Transform _waypoints;
 
-    private Transform[] arrayPlaces;
-    private int NumberOfPlaceInArrayPlaces;
+    private Transform[] _points;
+    private int _pointNumber;
 
     private void Start()
     {
-        arrayPlaces = new Transform[AllPlacesPoint.childCount];
+        _points = new Transform[_waypoints.childCount];
 
-        for (int i = 0; i < AllPlacesPoint.childCount; i++)
+        for (int i = 0; i < _waypoints.childCount; i++)
         {
-            arrayPlaces[i] = AllPlacesPoint.GetChild(i).GetComponent<Transform>();
+            _points[i] = _waypoints.GetChild(i).GetComponent<Transform>();
         }
     }
 
     private void Update()
     {
-        var pointByNumberInArray = arrayPlaces[NumberOfPlaceInArrayPlaces];
+        var endPoint = _points[_pointNumber];
 
         transform.position = Vector3.MoveTowards(transform.position, 
-            pointByNumberInArray.position,
+            endPoint.position,
             _speed * Time.deltaTime);
 
-        if (transform.position == pointByNumberInArray.position)
+        if (transform.position == endPoint.position)
         {
-            NextPlaceTakerLogic();
+            NextPlaced();
         }
     }
 
-
-    public Vector3 NextPlaceTakerLogic()
+    public Vector3 NextPlaced()
     {
-        NumberOfPlaceInArrayPlaces++;
+        _pointNumber++;
 
-        if (NumberOfPlaceInArrayPlaces == arrayPlaces.Length)
+        if (_pointNumber == _points.Length)
         {
-            NumberOfPlaceInArrayPlaces = 0;
+            _pointNumber = 0;
         }
            
-        var thisPointVector = arrayPlaces[NumberOfPlaceInArrayPlaces].transform.position;
-        transform.forward = thisPointVector - transform.position;
+        var direction = _points[_pointNumber].transform.position;
+        transform.forward = direction - transform.position;
 
-        return thisPointVector;
+        return direction;
     }
 }
